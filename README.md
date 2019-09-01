@@ -13,10 +13,6 @@ What things you need to install the software and how to install them?
 
 - Faire composer install
 
-#### Init
+# 
 
-```bash
-cp .env.dist .env
-docker-compose up -d
-docker-compose exec --user=application web bash
-```
+

@@ -5,6 +5,7 @@ namespace App\Entity;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\SubscriptionRepository")
@@ -20,11 +21,13 @@ class Subscription
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Assert\NotBlank()
      */
     private $name;
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Assert\NotBlank()
      */
     private $slogan;
 
@@ -36,11 +39,11 @@ class Subscription
     /**
      * @ORM\OneToMany(targetEntity="App\Entity\User", mappedBy="subscription")
      */
-    private $Subscription;
+    private $users;
 
     public function __construct()
     {
-        $this->Subscription = new ArrayCollection();
+        $this->users = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -87,28 +90,28 @@ class Subscription
     /**
      * @return Collection|User[]
      */
-    public function getSubscription(): Collection
+    public function getUsers(): Collection
     {
-        return $this->Subscription;
+        return $this->users;
     }
 
-    public function addSubscription(User $subscription): self
+    public function addUser(User $user): self
     {
-        if (!$this->Subscription->contains($subscription)) {
-            $this->Subscription[] = $subscription;
-            $subscription->setSubscription($this);
+        if (!$this->users->contains($user)) {
+            $this->users[] = $user;
+            $user->setSubscription($this);
         }
 
         return $this;
     }
 
-    public function removeSubscription(User $subscription): self
+    public function removeUser(User $user): self
     {
-        if ($this->Subscription->contains($subscription)) {
-            $this->Subscription->removeElement($subscription);
+        if ($this->users->contains($user)) {
+            $this->users->removeElement($user);
             // set the owning side to null (unless already changed)
-            if ($subscription->getSubscription() === $this) {
-                $subscription->setSubscription(null);
+            if ($user->getSubscription() === $this) {
+                $user->setSubscription(null);
             }
         }
 
