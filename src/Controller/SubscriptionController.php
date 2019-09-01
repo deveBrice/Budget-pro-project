@@ -11,7 +11,8 @@ use FOS\RestBundle\Controller\Annotations as Rest;
 use Symfony\Component\Validator\ConstraintViolationListInterface;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
 use Symfony\Component\HttpFoundation\Request;
-
+use FOS\RestBundle\View\View;
+use Swagger\Annotations as SWG;
 
 class SubscriptionController extends AbstractFOSRestController
 {
@@ -45,7 +46,7 @@ class SubscriptionController extends AbstractFOSRestController
     }
 
     /**    
-     * @Rest\Post("/api/subscribe") 
+     * @Rest\Post("/api/subscription") 
      * @ParamConverter("subscription", converter="fos_rest.request_body")   
      */
     public function postApiSubscription(Subscription $subscription, ConstraintViolationListInterface $validationErrors, Request $request)
@@ -72,12 +73,9 @@ class SubscriptionController extends AbstractFOSRestController
     } else {
         $subscription = new Subscription();
 
-        $subscription->setEmail($request->get('email'));
-        $subscription->setApiKey($request->get('apiKey'));
-        $subscription->setCreatedAt(new \DateTime ('now'));
-        $subscription->setPassword($request->get('password'));
-
-       // $em = $this->getDoctrine()->getManager();
+        $subscription->setName($request->get('name'));
+        $subscription->setSlogan($request->get('slogan'));
+        $subscription->setUrl($request->get('url'));
         
         $this->emi->persist($subscription);
         $this->emi->flush();
@@ -85,6 +83,47 @@ class SubscriptionController extends AbstractFOSRestController
     }
 
   }
+
+   /**
+     * @Rest\Put("/api/subscription/{name}")
+     *  @SWG\Response(
+     *       response=200,
+     *       description="edit a subscription",   
+     * )
+     * 
+     * @SWG\Parameter(
+     *      name="",
+     *      in="query",
+     *      type="string" 
+     * )   
+     */
+    public function updateApiUser(Subscription $subscription, string $name, Request $request): View
+    {
+      $subscription = $this->subscriptionRepository->findOneBy(['name' => $name]);
+      if($subscription){
+        $subscription->setName($request->get('name'));
+        $subscription->setSlogan($request->get('slogan'));
+        $subscription->setUrl($request->get('url'));
+        $this->emi->persist($subscription);
+        $this->emi->flush(); 
+      }
+      
+        return View::create($subscription, Response::HTTP_OK);
+    }
+
+    /**    
+     * @Rest\Delete("/api/subscription/{name}")    
+     */
+    public function deleteApiUser(Subscription $subscription, string $name): View
+    {
+     $subscription = $this->subscriptionRepository->findOneBy(['name' => $name]);
+     
+      if($subscription) {
+        $this->emi->remove($subscription);
+        $this->emi->flush();
+    }  
+      return $this->view($subscription);
+    }
 
 }
 
