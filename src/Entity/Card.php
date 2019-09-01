@@ -2,9 +2,8 @@
 
 namespace App\Entity;
 
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\CardRepository")
@@ -20,38 +19,38 @@ class Card
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Assert\NotBlank()
      */
     private $name;
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Assert\NotBlank()
      */
     private $creditCardType;
 
     /**
      * @ORM\Column(type="integer")
+     * @Assert\NotBlank()
      */
     private $creditCardNumber;
 
     /**
-     * @ORM\Column(type="string", length=3)
+     * @ORM\Column(type="integer")
+     * @Assert\NotBlank()
      */
     private $currencyCode;
 
     /**
      * @ORM\Column(type="integer")
+     * @Assert\NotBlank()
      */
     private $value;
 
     /**
-     * @ORM\OneToMany(targetEntity="App\Entity\User", mappedBy="card")
+     * @ORM\ManyToOne(targetEntity="App\Entity\User", inversedBy="cards")
      */
-    private $cards;
-
-    public function __construct()
-    {
-        $this->cards = new ArrayCollection();
-    }
+    private $user;
 
     public function getId(): ?int
     {
@@ -94,12 +93,12 @@ class Card
         return $this;
     }
 
-    public function getCurrencyCode(): ?string
+    public function getCurrencyCode(): ?int
     {
         return $this->currencyCode;
     }
 
-    public function setCurrencyCode(string $currencyCode): self
+    public function setCurrencyCode(int $currencyCode): self
     {
         $this->currencyCode = $currencyCode;
 
@@ -118,33 +117,14 @@ class Card
         return $this;
     }
 
-    /**
-     * @return Collection|User[]
-     */
-    public function getCards(): Collection
+    public function getUser(): ?User
     {
-        return $this->cards;
+        return $this->user;
     }
 
-    public function addCard(User $card): self
+    public function setUser(?User $user): self
     {
-        if (!$this->cards->contains($card)) {
-            $this->cards[] = $card;
-            $card->setCard($this);
-        }
-
-        return $this;
-    }
-
-    public function removeCard(User $card): self
-    {
-        if ($this->cards->contains($card)) {
-            $this->cards->removeElement($card);
-            // set the owning side to null (unless already changed)
-            if ($card->getCard() === $this) {
-                $card->setCard(null);
-            }
-        }
+        $this->user = $user;
 
         return $this;
     }
