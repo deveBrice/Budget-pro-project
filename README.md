@@ -10,7 +10,7 @@ These instructions will get you a copy of the project up and running on your loc
 ### Install
 
 - Do composer install
-- Take my csv file that content my database in the root of project and show in the header tab import on phpmyadmin 
+- Take my sql file that content my database in the root of project and show in the header tab import on phpmyadmin 
   
 
 ### Server
