@@ -13,7 +13,7 @@ use Symfony\Component\Validator\ConstraintViolationListInterface;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
 use Symfony\Component\HttpFoundation\Request;
 use Swagger\Annotations as SWG;
-use Nelmio\ApiDocBundle\Annotation\ApiDoc;
+use FOS\RestBundle\View\View;
 
 class CardController extends AbstractFOSRestController
 {
@@ -82,4 +82,48 @@ class CardController extends AbstractFOSRestController
     }
 
   }
+
+  /**
+     * @Rest\Put("/api/card/{name}")
+     *  @SWG\Response(
+     *       response=200,
+     *       description="edit a card",   
+     * )
+     * 
+     * @SWG\Parameter(
+     *      name="",
+     *      in="query",
+     *      type="string" 
+     * )   
+     */
+    public function updateApiUser(Card $card, string $name, Request $request): View
+    {
+      $card = $this->cardRepository->findOneBy(['name' => $name]);
+      if($card){
+        $card->setName($request->get('name'));
+        $card->setCreditCardType($request->get('creditCardType'));
+        $card->setCreditCardType($request->get('creditCardNumber'));
+        $card->setCurrencyCode($request->get('currencyCode'));
+        $card->setValue($request->get('value'));
+        $this->emi->persist($card);
+        $this->emi->flush(); 
+      }
+      
+        return View::create($card, Response::HTTP_OK);
+    }
+
+    /**    
+     * @Rest\Delete("/api/card/{name}")    
+     */
+    public function deleteApiUser(Card $card, string $name): View
+    {
+     $card = $this->cardRepository->findOneBy(['name' => $name]);
+     
+      if($card) {
+        $this->emi->remove($card);
+        $this->emi->flush();
+    }  
+      return $this->view($card);
+    }
+
 }
